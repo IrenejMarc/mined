@@ -19,12 +19,32 @@ class Client
 		Server _server;
 		Socket _socket;
 		GameState _state;
+		Buffer _packetBuffer;
 	}
 
 	this(Server server, Socket socket)
 	{
 		_server = server;
 		_socket = socket;
+	}
+
+	void appendBuffer(Buffer buf)
+	{
+		_packetBuffer ~= buf;
+	}
+
+	void processBuffer()
+	{
+		import app;
+		if (_packetBuffer.length > 0)
+		{
+			int packetLength = VarInt.peek(_packetBuffer).value;
+			while (_packetBuffer.length > packetLength)
+			{
+				dispatchPacket(_packetBuffer[1 .. packetLength + 1], packetLength);
+				_packetBuffer = _packetBuffer[packetLength .. $];
+			}
+		}
 	}
 
 	void write(ConstBuffer buffer)
@@ -50,30 +70,33 @@ class Client
 
 		logDev("Dispatching packet type %d of length %d", packetType, length);
 
-		final switch (_state)
+		if (_state == GameState.HANDSHAKING)
 		{
-			case GameState.HANDSHAKING:
-				switch (packetType)
-				{
-					case 0x00:
-						HandshakeHandler(this).handle(buffer);
-						break;
-					default:
-						throw new Exception("Packet 0x%x not implemented for state %d!".format(packetType, _state));
-				}
-				break;
-			case GameState.STATUS: break;
-			case GameState.LOGIN:
-				switch (packetType)
-				{
-					case 0x00:
-						LoginStartHandler(this).handle(buffer);
-						break;
-					default:
-						throw new Exception("Packet 0x%x not implemented for state %d!".format(packetType, _state));
-				}
-
+			switch (packetType)
+			{
+				case 0x00:
+					_state = HandshakeHandler(this).handle(buffer);
+					break;
+				default:
+					throw new Exception("Packet 0x%x not implemented for state %d!".format(packetType, _state));
+			}
 		}
+		else if (_state == GameState.STATUS)
+		{
+		}
+		else if (_state == GameState.LOGIN)
+		{
+			switch (packetType)
+			{
+				case 0x00:
+					_state = LoginStartHandler(this).handle(buffer);
+					break;
+				default:
+					throw new Exception("Packet 0x%x not implemented for state %d!".format(packetType, _state));
+			}
+		}
+		else
+			throw new Exception("State %d not implement (packet: %d)".format(_state, packetType));
 	}
 
 	void close()

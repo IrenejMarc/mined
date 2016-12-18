@@ -14,7 +14,8 @@ class Server
 	private
 	{
 		TcpSocket _serverSocket;
-		Client[Socket] _clients;
+		Client[const Socket] _clients;
+		Buffer[const Socket] _buffers;
 	}
 
 
@@ -45,8 +46,6 @@ class Server
 		SocketSet socketSet = new SocketSet(maxConnections + 1);
 		Socket[] reads;
 
-		Buffer partialPackets;
-
 		while(true)
 		{
 			// Accept any incoming connections and add them to to socket set
@@ -57,33 +56,30 @@ class Server
 
 			Socket.select(socketSet, null, null);
 
-			for (uint i = 0; i < reads.length; ++i)
+			for (size_t i = 0; i < reads.length; ++i)
 			{
+				auto socket = reads[i];
+
+				// Make sure client exists in the client list
+				auto clientp = socket in _clients;
+
+				if (clientp is null)
+					_clients[socket] = new Client(this, socket);
+
+				Client client = _clients[socket];
+
+				// Read the received data
 				Buffer buf;
 				buf.length = 2048;
-				auto received = reads[i].receive(buf[]);
+
+				auto received = socket.receive(buf);
+				//buf.length = received;
 
 				if (received != 0)
 				{
-					logDev("Received %d bytes: %s", received, buf[0 .. received]);
-					auto client = reads[i] in _clients;
-					if (client is null)
-						_clients[reads[i]] = new Client(this, reads[i]);
-
-					int sent = 0;
-					int packetLength = 0;
-					// Respond to all received packets
-					do
-					{
-						packetLength = VarInt.read(buf).value;
-						logDev("Read length of packet: %d", packetLength);
-						_clients[reads[i]].dispatchPacket(buf[0 .. packetLength], packetLength);
-						sent = packetLength;
-						buf = buf[sent .. $];
-
-					}
-					while (packetLength <= sent + received);
-
+					logDev(" * SERVER: Received %d bytes: %s", received, buf[0 .. received]);
+					client.appendBuffer(buf[0 .. received]);
+					client.processBuffer();
 
 					continue;
 				}

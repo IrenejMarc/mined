@@ -19,10 +19,3 @@ void main()
 	server.run();
 }
 
-void printBuffer(T)(T buf, string fun = __FUNCTION__, int line = __LINE__)
-{
-	logDevS("\x1b[31m%s\x1B[0m:\x1b[35m%d\x1B[0m: Buffer is (%d): ", fun, line, buf.length);
-	foreach (i; 0 .. buf.length)
-		std.stdio.writef("0x%x ", buf[i]);
-	std.stdio.writeln();
-}

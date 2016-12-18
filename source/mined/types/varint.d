@@ -66,6 +66,22 @@ struct VarInt
 		_representation = buf;
 	}
 
+	static VarInt peek(Buffer buffer)
+	{
+		Buffer buf;
+
+		ubyte read = 0;
+		int nRead = 0;
+
+		do
+		{
+			read = buffer.read!ubyte;
+			buf ~= read;
+		} while((read & END_MASK) != 0 && ++nRead <= MAX_VARINT_LENGTH);
+
+		return VarInt(buf);
+	}
+
 	static VarInt read(ref Buffer buffer)
 	{
 		Buffer buf;

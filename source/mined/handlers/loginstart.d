@@ -3,6 +3,7 @@ module mined.handlers.loginstart;
 import mined.client;
 import mined.util.buffer;
 import mined.gamestate;
+import mined.util.logging;
 
 struct LoginStartHandler
 {
@@ -15,6 +16,7 @@ struct LoginStartHandler
 
 	GameState handle(Buffer buffer)
 	{
+		logDev("Handling LoginStart!");
 		return GameState.HANDSHAKING;
 	}
 }
