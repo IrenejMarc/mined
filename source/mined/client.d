@@ -43,13 +43,14 @@ class Client
 	void dispatchPacket(Buffer buffer, int length)
 	{
 		import mined.handlers.handshake;
+		import mined.handlers.loginstart;
 		import std.bitmanip : read;
 
 		auto packetType = VarInt.read(buffer).value;
 
 		logDev("Dispatching packet type %d of length %d", packetType, length);
 
-		switch (_state)
+		final switch (_state)
 		{
 			case GameState.HANDSHAKING:
 				switch (packetType)
@@ -61,6 +62,7 @@ class Client
 						throw new Exception("Packet 0x%x not implemented for state %d!".format(packetType, _state));
 				}
 				break;
+			case GameState.STATUS: break;
 			case GameState.LOGIN:
 				switch (packetType)
 				{

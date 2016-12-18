@@ -136,7 +136,7 @@ class Server
 			assert(listener.isAlive);
 			assert(client.isAlive);
 
-			if (reads.length < maxConnections)
+			if (reads.length < socketSet.max)
 			{
 				logDebug("Connection from %s established.", client.remoteAddress);
 				reads ~= client;
