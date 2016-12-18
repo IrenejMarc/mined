@@ -57,7 +57,7 @@ struct VarInt
 			value >>>= 7;
 
 			if (value != 0) 
-				temp |= 0b10000000;
+				temp |= END_MASK;
 			buf ~= temp;
 
 		}
@@ -66,18 +66,19 @@ struct VarInt
 		_representation = buf;
 	}
 
-	static VarInt peek(Buffer buffer)
+	static VarInt peek(Buffer buffer, ref int nRead)
 	{
 		Buffer buf;
 
 		ubyte read = 0;
-		int nRead = 0;
+		nRead = 0;
 
 		do
 		{
 			read = buffer.read!ubyte;
 			buf ~= read;
-		} while((read & END_MASK) != 0 && ++nRead <= MAX_VARINT_LENGTH);
+			nRead += 1;
+		} while((read & END_MASK) != 0 && nRead <= MAX_VARINT_LENGTH);
 
 		return VarInt(buf);
 	}

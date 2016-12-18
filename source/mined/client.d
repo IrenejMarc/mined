@@ -36,14 +36,22 @@ class Client
 	void processBuffer()
 	{
 		import app;
-		if (_packetBuffer.length > 0)
+		while (true)
 		{
-			int packetLength = VarInt.peek(_packetBuffer).value;
-			while (_packetBuffer.length > packetLength)
-			{
-				dispatchPacket(_packetBuffer[1 .. packetLength + 1], packetLength);
-				_packetBuffer = _packetBuffer[packetLength .. $];
-			}
+			if (_packetBuffer.length == 0)
+				break;
+
+			int nRead = 0;
+			int packetLength = VarInt.peek(_packetBuffer, nRead).value;
+			logDev("Packet lengt: %d, bytes read: %d", packetLength, nRead);
+
+			if (packetLength > _packetBuffer.length)
+				break;
+
+			dispatchPacket(_packetBuffer[nRead .. packetLength + 1], packetLength);
+			_packetBuffer = _packetBuffer[packetLength + 1 .. $];
+			logDev("Consumed buffer");
+			printBuffer(_packetBuffer);
 		}
 	}
 

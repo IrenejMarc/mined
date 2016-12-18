@@ -14,8 +14,7 @@ class Server
 	private
 	{
 		TcpSocket _serverSocket;
-		Client[const Socket] _clients;
-		Buffer[const Socket] _buffers;
+		Client[const socket_t] _clients;
 	}
 
 
@@ -61,31 +60,33 @@ class Server
 				auto socket = reads[i];
 
 				// Make sure client exists in the client list
-				auto clientp = socket in _clients;
+				auto clientp = socket.handle in _clients;
 
 				if (clientp is null)
-					_clients[socket] = new Client(this, socket);
+				{
+					logDev("Client not found");
+					_clients[socket.handle] = new Client(this, socket);
+				}
 
-				Client client = _clients[socket];
+				Client client = _clients[socket.handle];
 
 				// Read the received data
 				Buffer buf;
 				buf.length = 2048;
 
 				auto received = socket.receive(buf);
-				//buf.length = received;
 
-				if (received != 0)
+				if (received == Socket.ERROR)
+				{
+					logDebug("Connection error.");
+				}
+				else if (received != 0)
 				{
 					logDev(" * SERVER: Received %d bytes: %s", received, buf[0 .. received]);
 					client.appendBuffer(buf[0 .. received]);
 					client.processBuffer();
 
 					continue;
-				}
-				else if (received == Socket.ERROR)
-				{
-					logDebug("Connection error.");
 				}
 				else
 				{
