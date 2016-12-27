@@ -3,6 +3,7 @@ module mined.types.varint;
 
 import std.bitmanip;
 import std.string : format;
+import std.conv : to;
 
 import mined.util.buffer;
 import mined.util.logging;
@@ -27,6 +28,11 @@ struct VarInt
 		opAssign(value);
 	}
 
+	this(VarInt value)
+	{
+		opAssign(value);
+	}
+
 	@property int value()
 	{
 		return VarInt._toInt(_representation);
@@ -36,6 +42,11 @@ struct VarInt
 	{
 		return _representation.dup;
 	}
+	
+	@property int length()
+	{
+		return _representation.length.to!int;
+	}
 
 	// Reads a VarInt from the given buffer
 	void opAssign(Buffer varInt)
@@ -44,6 +55,11 @@ struct VarInt
 				"VarInt opAssign can only be used with actual VarInt representations, "~
 				"do not use it with buffers");
 		_representation = varInt;
+	}
+
+	void opAssign(VarInt varInt)
+	{
+		_representation = varInt._representation.dup;
 	}
 
 	// Converts the VarInt to the proper format, returns a Buffer

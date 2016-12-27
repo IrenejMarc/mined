@@ -10,6 +10,7 @@ import mined.types.varint;
 import mined.util.logging;
 import mined.server;
 import mined.gamestate;
+import mined.packet;
 
 
 class Client
@@ -49,6 +50,11 @@ class Client
 			dispatchPacket(_packetBuffer[nRead .. packetLength + 1], packetLength);
 			_packetBuffer = _packetBuffer[packetLength + 1 .. $];
 		}
+	}
+
+	void write(Packet packet)
+	{
+		_socket.send(packet);
 	}
 
 	void write(ConstBuffer buffer)
