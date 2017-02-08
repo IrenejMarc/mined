@@ -21,3 +21,6 @@ I doubt this will ever get finished, I just felt like trying it. Never worked wi
  - Basic login, basic map (flat grass) generator
  - Chat
  - Refactoring the state machine into functions, not structs, they need no state
+
+# Useful developer resources
+ - http://wiki.vg/Main_Page
