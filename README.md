@@ -50,5 +50,8 @@ I doubt this will ever get finished, I just felt like trying it. Never worked wi
  
 ## Developer chat
  - If enough developers join us, we might create a chat group (Skype, Telegram, Slack, Discord, anything)
+ 
+## Contacting developers
+ - The owner of this project is IrenejMarc on GitHub, Twitter: @IrenejMarc, you can ask me for Telegram or Skype if you want to chat.
 ## Editors
  - Use Vim if you like yourself, emacs if you hate yourself and your wrists.
