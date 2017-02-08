@@ -1,5 +1,7 @@
 module mined.packet;
 
+import std.string : format;
+
 import mined.util.buffer;
 import mined.types.varint;
 import mined.util.logging;
@@ -12,6 +14,11 @@ struct Packet
 
 	alias get this;
 
+	string toString()
+	{
+		return "<Packet -- Length: %d, Type: %d, Data: %s>".format(length, type, data);
+	}
+
 	this(int type, ConstBuffer data)
 	{
 		this.type = type;
@@ -20,6 +27,25 @@ struct Packet
 		VarInt packetType = VarInt(type);
 
 		this.length = packetType.length;
+	}
+
+	static Packet read(Buffer buffer)
+	{
+		Packet packet;
+
+		int nRead = 0;
+
+		packet.length = VarInt.peek(buffer, nRead).value;
+		packet.type = VarInt.peek(buffer, nRead, nRead).value;
+
+		packet.data = buffer[nRead .. buffer.length].dup;
+
+		return packet;
+	}
+
+	void updateLength()
+	{
+		length = (VarInt(type).length + data.length).to!int;
 	}
 
 	@property ConstBuffer get()

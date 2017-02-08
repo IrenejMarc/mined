@@ -5,6 +5,7 @@ import std.string : representation;
 
 import mined.types.varint;
 import mined.util.buffer;
+import std.conv : to;
 
 struct String
 {

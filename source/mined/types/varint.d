@@ -82,12 +82,12 @@ struct VarInt
 		_representation = buf;
 	}
 
-	static VarInt peek(Buffer buffer, ref int nRead)
+	static VarInt peek(Buffer buffer, ref int nRead, int offset = 0)
 	{
+		buffer = buffer[offset .. $].dup;
 		Buffer buf;
 
 		ubyte read = 0;
-		nRead = 0;
 
 		do
 		{
@@ -146,4 +146,12 @@ class VarIntTooBigException : Exception
 	{
 		super(msg);
 	}
+}
+
+unittest
+{
+	Buffer buf = [167, 1];
+	logDev("Varint %d", VarInt.read(buf).value);
+	logDev("%s", VarInt(167));
+	assert(VarInt(167).get == [167], "Varint conversion failure");
 }

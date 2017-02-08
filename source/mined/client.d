@@ -36,10 +36,13 @@ class Client
 
 	void processBuffer()
 	{
+		import mined.packet;
+
 		while (true)
 		{
 			if (_packetBuffer.length == 0)
 				break;
+
 
 			int nRead = 0;
 			int packetLength = VarInt.peek(_packetBuffer, nRead).value;
@@ -47,18 +50,24 @@ class Client
 			if (packetLength > _packetBuffer.length)
 				break;
 
+			Packet packet = Packet.read(_packetBuffer);
+			logDev("Packet is: %s", packet);
+
 			dispatchPacket(_packetBuffer[nRead .. packetLength + 1], packetLength);
 			_packetBuffer = _packetBuffer[packetLength + 1 .. $];
+
+			logDev("Remaining buffer: %s", _packetBuffer);
 		}
 	}
 
 	void write(Packet packet)
 	{
-		_socket.send(packet);
+		write(packet.get());
 	}
 
 	void write(ConstBuffer buffer)
 	{
+		logDev(">>> %s", buffer);
 		_socket.send(buffer);
 	}
 
@@ -74,6 +83,9 @@ class Client
 	{
 		import mined.handlers.handshake;
 		import mined.handlers.loginstart;
+		import mined.handlers.status;
+		import mined.handlers.ping;
+
 		import std.bitmanip : read;
 
 		auto packetType = VarInt.read(buffer).value;
@@ -89,10 +101,21 @@ class Client
 					break;
 				default:
 					throw new Exception("Packet 0x%x not implemented for state %d!".format(packetType, _state));
+				case 0xFE:
+					_state = StatusHandler(this).handle([cast(ubyte) 0xFE] ~ buffer);
+					break;
 			}
 		}
 		else if (_state == GameState.STATUS)
 		{
+			if (packetType == 0x00)
+			{
+				StatusHandler(this).handle(buffer);
+			}
+			else if (packetType == 0x01)
+			{
+				PingHandler(this).handle(buffer);
+			}
 		}
 		else if (_state == GameState.LOGIN)
 		{
