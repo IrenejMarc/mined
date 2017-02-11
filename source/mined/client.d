@@ -23,6 +23,11 @@ class Client
 		Buffer _packetBuffer;
 	}
 
+	@property server()
+	{
+		return _server;
+	}
+
 	this(Server server, Socket socket)
 	{
 		_server = server;
@@ -93,7 +98,7 @@ class Client
 
 		import mined.handlers.dummy;
 		import mined.handlers.handshake;
-		alias HandlerType = GameState delegate(Packet, ref Client);
+		alias HandlerType = GameState delegate(Packet, Client);
 
 		GameState nullHandler(Packet packet)
 		{

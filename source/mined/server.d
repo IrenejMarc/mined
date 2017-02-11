@@ -8,6 +8,7 @@ import mined.client;
 import mined.util.logging;
 import mined.util.buffer;
 import mined.types.varint;
+import mined.config;
 
 class Server
 {
@@ -15,27 +16,41 @@ class Server
 	{
 		TcpSocket _serverSocket;
 		Client[const socket_t] _clients;
+		Config _config;
 	}
 
+	@property const Config config()
+	{
+		return _config;
+	}
 
 	this()
 	{
 		_serverSocket = new TcpSocket;
+		_config = Config.read();
+
+		logDev(" * Read config, is: %s", _config);
 	}
 
 	void bind()
 	{
-		ushort port = 25565;
+		ushort port = _config.bind.port;
 
 		assert(_serverSocket.isAlive);
 
 		_serverSocket.setOption(SocketOptionLevel.SOCKET, SocketOption.REUSEADDR, true);
 		_serverSocket.blocking = false;
 
-		_serverSocket.bind(new InternetAddress(port));
+		_serverSocket.bind(
+				new InternetAddress(
+					_config.bind.address,
+					_config.bind.port
+				)
+		);
+
 		_serverSocket.listen(1);
 
-		logDebug("Listening on port %d", port);
+		logDebug("Listening on port %d", _config.bind.port);
 	}
 
 	void run()

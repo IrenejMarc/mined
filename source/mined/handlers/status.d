@@ -10,11 +10,12 @@ import mined.types.string;
 import std.string;
 import std.json;
 
-GameState handleStatus(Packet packet, ref Client client)
+GameState handleStatus(Packet packet, Client client)
 {
 		logDev("Handling status");
 
 		Packet response;
+
 
 		JSONValue responseJson = [
 			"version": JSONValue([
@@ -22,12 +23,12 @@ GameState handleStatus(Packet packet, ref Client client)
 				"protocol": JSONValue(316)
 			]),
 			"players": JSONValue([
-				"max": JSONValue(64),
+				"max": JSONValue(client.server.config.maxPlayers),
 				"online": JSONValue(0),
 				"sample": JSONValue(),
 			]),
 			"description": JSONValue([
-				"text": JSONValue("Mined server")
+				"text": JSONValue(client.server.config.motd)
 			]),
 			"favicon": JSONValue("data:image/png;base64,<data>")
 		];

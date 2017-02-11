@@ -11,23 +11,7 @@ import mined.gamestate;
 import mined.packet;
 import mined.types.string;
 
-struct HandshakeHandler
-{
-	private Client _client;
-
-	this(Client client)
-	{
-		_client = client;
-	}
-
-	GameState handle(Buffer buffer)
-	{
-		return GameState.HANDSHAKING;
-	}
-}
-
-
-GameState handleHandshake(Packet packet, ref Client client)
+GameState handleHandshake(Packet packet, Client client)
 {
 	logDev("Packet data: %s", packet.data);
 	uint protocolVersion = VarInt.read(packet.data).value;

@@ -6,7 +6,7 @@ import mined.gamestate;
 import mined.packet;
 import mined.util.logging;
 
-GameState handlePing(Packet packet, ref Client client)
+GameState handlePing(Packet packet, Client client)
 {
 		logDev("Handling Ping packet");
 

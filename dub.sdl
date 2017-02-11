@@ -1,4 +1,7 @@
 name "mined"
-description "A minimal D application."
+description "A Minecraft server"
 copyright "Copyright © 2016, irenej"
 authors "irenej"
+
+dependency "sdlang-d" version="~>0.10.1"
+
