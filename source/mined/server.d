@@ -98,6 +98,8 @@ class Server
 					{
 						logDebug("Connection closed.");
 					}
+					logDev("* Removing client");
+					_clients.remove(socket.handle);
 				}
 
 				reads[i].close();
