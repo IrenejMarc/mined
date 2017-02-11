@@ -91,11 +91,6 @@ class Client
 
 		import std.bitmanip : read;
 
-		//auto packetType = VarInt.read(buffer).value;
-
-		//logDev("Dispatching packet type %d of length %d, current state is: %s", packetType, length, _state);
-
-
 		import mined.handlers.dummy;
 		import mined.handlers.handshake;
 		alias HandlerType = GameState delegate(Packet, Client);
