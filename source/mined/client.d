@@ -23,6 +23,8 @@ class Client
 		Buffer _packetBuffer;
 	}
 
+	ClientSettings settings;
+
 	@property const state()
 	{
 		return _state;
@@ -96,6 +98,8 @@ class Client
 		import mined.handlers.dummy;
 		import mined.handlers.handshake;
 		import mined.handlers.plugin_message;
+		import mined.handlers.client_settings;
+		import mined.handlers.keepalive;
 
 		import std.bitmanip : read;
 
@@ -120,7 +124,9 @@ class Client
 				0x00: &handleLoginstart,
 			],
 			GameState.PLAY: [
+				0x04: &handleClientSettings,
 				0x09: &handlePluginMessage,
+				0x0B: &handleKeepalive,
 			]
 		];
 
@@ -143,4 +149,14 @@ class Client
 		_socket.shutdown(SocketShutdown.BOTH);
 		_socket.close();
 	}
+}
+
+struct ClientSettings
+{
+	string locale;
+	byte viewDistance;
+	int chatMode;
+	bool chatColours;
+	ubyte skinMask;
+	int mainHand;
 }

@@ -10,6 +10,9 @@ import mined.util.buffer;
 import mined.types.varint;
 import mined.config;
 
+import deimos.openssl.ssl;
+import deimos.openssl.rsa;
+
 class Server
 {
 	private
@@ -17,6 +20,12 @@ class Server
 		TcpSocket _serverSocket;
 		Client[const socket_t] _clients;
 		Config _config;
+		ubyte[] _publicKey;
+	}
+
+	@property const(ubyte[]) publicKey()
+	{
+		return _publicKey;
 	}
 
 	@property const Config config()
@@ -24,11 +33,28 @@ class Server
 		return _config;
 	}
 
+	private void initOpenSSL()
+	{
+		SSL_load_error_strings();
+		OpenSSL_add_ssl_algorithms();
+	}
+
+	private void generatePublicKey()
+	{
+		int keyBits = 1024;
+		int keyExp = 3;
+
+		auto generatedKey = RSA_generate_key(keyBits, keyExp, null, null);
+		//_publicKey = cast(ubyte[]) generatedKey[0 .. keyBits];
+	}
+
 	this()
 	{
 		_serverSocket = new TcpSocket;
 		_config = Config.read();
 
+		initOpenSSL();
+		generatePublicKey();
 		logDev(" * Read config, is: %s", _config);
 	}
 

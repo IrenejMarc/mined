@@ -2,8 +2,9 @@
 	"fileVersion": 1,
 	"versions": {
 		"libinputvisitor": "1.2.2",
-		"unit-threaded": "0.6.36",
+		"openssl": "1.1.5+1.0.1g",
 		"sdlang-d": "0.10.1",
-		"taggedalgebraic": "0.10.5"
+		"taggedalgebraic": "0.10.5",
+		"unit-threaded": "0.6.36"
 	}
 }
