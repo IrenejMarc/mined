@@ -11,7 +11,7 @@ GameState handleKeepalive(Packet packet, Client client)
 	keepalive.data = packet.data;
 	keepalive.updateLength();
 
-	client.write(keepalive);
+	//client.write(keepalive);
 
 	return client.state;
 }
