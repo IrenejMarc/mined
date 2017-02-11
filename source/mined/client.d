@@ -105,16 +105,10 @@ class Client
 
 		alias HandlerType = GameState delegate(Packet, Client);
 
-		GameState nullHandler(Packet packet)
-		{
-			return _state; 
-		}
-
 		enum handlers =
 		[
 			GameState.HANDSHAKING: [
 				0x00: &handleHandshake,
-				0xFE: &dummyHandler,
 			],
 			GameState.STATUS: [
 				0x00: &handleStatus,
