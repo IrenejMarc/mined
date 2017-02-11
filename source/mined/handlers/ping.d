@@ -4,25 +4,18 @@ import mined.client;
 import mined.util.buffer;
 import mined.gamestate;
 import mined.packet;
+import mined.util.logging;
 
-struct PingHandler
+GameState handlePing(Packet packet, ref Client client)
 {
-	private Client _client;
-	
-	this(Client client)
-	{
-		_client = client;
-	}
+		logDev("Handling Ping packet");
 
-	GameState handle(Buffer buffer)
-	{
 		Packet response;
 		response.type = 0x01;
-		response.data = buffer;
+		response.data = packet.data;
 		response.updateLength();
 
-		_client.write(response);
+		client.write(response);
 
-		return GameState.STATUS;
-	}
+		return GameState.HANDSHAKING;
 }

@@ -101,10 +101,14 @@ struct VarInt
 
 	static VarInt read(ref Buffer buffer)
 	{
+		int nRead = 0;
+		return read(buffer, nRead);
+	}
+	static VarInt read(ref Buffer buffer, ref int nRead)
+	{
 		Buffer buf;
 
 		ubyte read = 0;
-		int nRead = 0;
 
 		do
 		{

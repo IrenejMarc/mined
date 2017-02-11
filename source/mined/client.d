@@ -51,12 +51,10 @@ class Client
 				break;
 
 			Packet packet = Packet.read(_packetBuffer);
-			logDev("Packet is: %s", packet);
+			logDev(" * Packet is: %s", packet);
+			dispatchPacket(packet);
 
-			dispatchPacket(_packetBuffer[nRead .. packetLength + 1], packetLength);
-			_packetBuffer = _packetBuffer[packetLength + 1 .. $];
-
-			logDev("Remaining buffer: %s", _packetBuffer);
+			logDev("* Remaining buffer: %s", _packetBuffer);
 		}
 	}
 
@@ -79,7 +77,7 @@ class Client
 		client.send(VarInt(data.length.to!int).get ~ data);
 	}
 
-	void dispatchPacket(Buffer buffer, int length)
+	void dispatchPacket(Packet packet)
 	{
 		import mined.handlers.handshake;
 		import mined.handlers.loginstart;
@@ -88,48 +86,47 @@ class Client
 
 		import std.bitmanip : read;
 
-		auto packetType = VarInt.read(buffer).value;
+		//auto packetType = VarInt.read(buffer).value;
 
-		logDev("Dispatching packet type %d of length %d", packetType, length);
+		//logDev("Dispatching packet type %d of length %d, current state is: %s", packetType, length, _state);
 
-		if (_state == GameState.HANDSHAKING)
+
+		import mined.handlers.dummy;
+		import mined.handlers.handshake;
+		alias HandlerType = GameState delegate(Packet, ref Client);
+
+		GameState nullHandler(Packet packet)
 		{
-			switch (packetType)
-			{
-				case 0x00:
-					_state = HandshakeHandler(this).handle(buffer);
-					break;
-				default:
-					throw new Exception("Packet 0x%x not implemented for state %d!".format(packetType, _state));
-				case 0xFE:
-					_state = StatusHandler(this).handle([cast(ubyte) 0xFE] ~ buffer);
-					break;
-			}
+			return _state; 
 		}
-		else if (_state == GameState.STATUS)
-		{
-			if (packetType == 0x00)
-			{
-				StatusHandler(this).handle(buffer);
-			}
-			else if (packetType == 0x01)
-			{
-				PingHandler(this).handle(buffer);
-			}
-		}
-		else if (_state == GameState.LOGIN)
-		{
-			switch (packetType)
-			{
-				case 0x00:
-					_state = LoginStartHandler(this).handle(buffer);
-					break;
-				default:
-					throw new Exception("Packet 0x%x not implemented for state %d!".format(packetType, _state));
-			}
-		}
-		else
-			throw new Exception("State %d not implement (packet: %d)".format(_state, packetType));
+
+		enum handlers =
+		[
+			GameState.HANDSHAKING: [
+				0x00: &handleHandshake,
+				0xFE: &dummyHandler,
+			],
+			GameState.STATUS: [
+				0x00: &handleStatus,
+				0x01: &handlePing,
+			],
+			GameState.LOGIN: [
+				0x00: &dummyHandler,
+			]
+		];
+
+		auto state = _state in handlers;
+		if (state == null)
+			return logError("No state %s found in handlers", _state);
+
+		auto handler = packet.type in handlers[_state];
+		if (handler == null)
+			return logError("No handler for state: %s, packetType: %d", _state, packet.type);
+
+		logDev("Got handler for state %s, packet %d", _state, packet.type);
+		_state = (*handler)(packet, this);
+
+		logDev("State switched to %s", _state);
 	}
 
 	void close()

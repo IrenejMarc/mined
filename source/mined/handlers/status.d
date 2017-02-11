@@ -10,17 +10,8 @@ import mined.types.string;
 import std.string;
 import std.json;
 
-struct StatusHandler
+GameState handleStatus(Packet packet, ref Client client)
 {
-	private Client _client;
-
-	this(Client client)
-	{
-		_client = client;
-	}
-
-	GameState handle(Buffer buffer)
-	{
 		logDev("Handling status");
 
 		Packet response;
@@ -50,8 +41,7 @@ struct StatusHandler
 		response.updateLength();
 		logDev("Response length: %d, type: %d", response.length, response.type);
 
-		_client.write(response);
+		client.write(response);
 
 		return GameState.STATUS;
-	}
 }

@@ -19,6 +19,11 @@ void logDev(T...)(string format, T args)
 	writeln();
 }
 
+void logError(T...)(string format, T args)
+{
+	writefln("\x1B[31m[ERROR]\x1B[0m " ~ format, args);
+}
+
 void printBuffer(T)(T buf, string fun = __FUNCTION__, int line = __LINE__)
 {
 	logDev("\x1b[31m%s\x1B[0m:\x1b[35m%d\x1B[0m: Buffer is (%d): %s", fun, line, buf.length, buf);

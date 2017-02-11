@@ -29,16 +29,17 @@ struct Packet
 		this.length = packetType.length;
 	}
 
-	static Packet read(Buffer buffer)
+	static Packet read(ref Buffer buffer)
 	{
 		Packet packet;
 
 		int nRead = 0;
 
 		packet.length = VarInt.peek(buffer, nRead).value;
-		packet.type = VarInt.peek(buffer, nRead, nRead).value;
+		packet.data = buffer[nRead .. packet.length + 1].dup;
+		buffer = buffer[packet.data.length + 1 .. $];
 
-		packet.data = buffer[nRead .. buffer.length].dup;
+		packet.type = VarInt.read(packet.data).value;
 
 		return packet;
 	}

@@ -64,7 +64,7 @@ class Server
 
 				if (clientp is null)
 				{
-					logDev("Client not found");
+					logDev(" * Client not found, creating new client");
 					_clients[socket.handle] = new Client(this, socket);
 				}
 

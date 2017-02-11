@@ -8,6 +8,8 @@ import mined.util.logging;
 import mined.client;
 import mined.types.varint;
 import mined.gamestate;
+import mined.packet;
+import mined.types.string;
 
 struct HandshakeHandler
 {
@@ -20,18 +22,24 @@ struct HandshakeHandler
 
 	GameState handle(Buffer buffer)
 	{
-		uint protocolVersion = VarInt.read(buffer).value;
-
-		int hostLength = VarInt.read(buffer).value;
-
-		string hostname = cast(string) buffer[0 .. hostLength];
-		buffer = buffer[hostLength .. $];
-		ushort port = buffer.read!ushort;
-		int nextState = VarInt.read(buffer).value;
-
-		logDev("Protocol: %d, hostname: %s, port: %d, nextState: %d", protocolVersion, hostname, port, nextState);
-
-		return cast(GameState) nextState;
+		return GameState.HANDSHAKING;
 	}
 }
 
+
+GameState handleHandshake(Packet packet, ref Client client)
+{
+	logDev("Packet data: %s", packet.data);
+	uint protocolVersion = VarInt.read(packet.data).value;
+	logDev("	* Remaining buffer: %s", packet.data);
+	string hostname = String.read(packet.data);
+	logDev("	* Read hostname: %s, Remaining buffer: %s", hostname, packet.data);
+	ushort port = packet.data.read!ushort;
+	logDev("	* Read port: %d, Remaining buffer: %s", port, packet.data);
+	int nextState = VarInt.read(packet.data).value;
+	logDev("	* Remaining buffer: %s", packet.data);
+
+	logDev("Protocol: %d, hostname: %s, port: %d, nextState: %d", protocolVersion, hostname, port, nextState);
+
+	return cast(GameState) nextState;
+}
