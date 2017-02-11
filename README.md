@@ -53,6 +53,7 @@ I doubt this will ever get finished, I just felt like trying it. Never worked wi
  
 ## Contacting developers
  - The owner of this project is IrenejMarc on GitHub, Twitter: @IrenejMarc, you can ask me for Telegram or Skype if you want to chat.
+ - Join our Discord server https://discord.gg/Y6mPUbY if you want to join the team or just have any questions
  
 ## Editors
  - Use Vim if you like yourself, emacs if you hate yourself and your wrists.
