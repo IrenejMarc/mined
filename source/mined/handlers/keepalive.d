@@ -6,7 +6,12 @@ import mined.packet;
 
 GameState handleKeepalive(Packet packet, Client client)
 {
-	client.write(packet);
+	Packet keepalive;
+	keepalive.type = 0x1F;
+	keepalive.data = packet.data;
+	keepalive.updateLength();
+
+	client.write(keepalive);
 
 	return client.state;
 }
