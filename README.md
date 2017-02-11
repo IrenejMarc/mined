@@ -18,10 +18,10 @@ I doubt this will ever get finished, I just felt like trying it. Never worked wi
  - Support for thread-less connection of players, allowing for a huge amount of players to be on at the same time through select() polling
  
 # Priorities for the moment
- - Server list ping
+ - SSL
  - Basic login, basic map (flat grass) generator
  - Chat
- - Refactoring the state machine into functions, not structs, they need no state
+ - Packet encryption
 
 # Developer information
 ## Resources
