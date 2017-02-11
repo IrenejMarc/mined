@@ -93,11 +93,12 @@ class Client
 		import mined.handlers.loginstart;
 		import mined.handlers.status;
 		import mined.handlers.ping;
+		import mined.handlers.dummy;
+		import mined.handlers.handshake;
+		import mined.handlers.plugin_message;
 
 		import std.bitmanip : read;
 
-		import mined.handlers.dummy;
-		import mined.handlers.handshake;
 		alias HandlerType = GameState delegate(Packet, Client);
 
 		GameState nullHandler(Packet packet)
@@ -117,6 +118,9 @@ class Client
 			],
 			GameState.LOGIN: [
 				0x00: &handleLoginstart,
+			],
+			GameState.PLAY: [
+				0x09: &handlePluginMessage,
 			]
 		];
 

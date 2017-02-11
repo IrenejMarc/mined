@@ -1,6 +1,7 @@
 module mined.packet;
 
 import std.string : format;
+import std.conv : to;
 
 import mined.util.buffer;
 import mined.types.varint;
@@ -16,7 +17,7 @@ struct Packet
 
 	string toString()
 	{
-		return "<Packet -- Length: %d, Type: %d, Data: %s>".format(length, type, data);
+		return "<Packet -- Length: %d, Type: 0x%x, Data: %s>".format(length, type, data);
 	}
 
 	this(int type, ConstBuffer data)
