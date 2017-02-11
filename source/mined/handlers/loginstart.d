@@ -1,6 +1,7 @@
 module mined.handlers.loginstart;
 
 import std.conv : to;
+import std.json;
 
 import mined.client;
 import mined.util.buffer;
@@ -10,45 +11,51 @@ import mined.types.string;
 import mined.types.varint;
 import mined.packet;
 
-struct LoginStartHandler
+GameState handleLoginstart(Packet packet, Client client)
 {
-	private Client _client;
-	
-	this(Client client)
-	{
-		_client = client;
-	}
+	logDev("Handling LoginStart!");
+	string username = String.read(packet.data);
 
-	void sendEncryptionRequest()
-	{
-		Packet encryptionRequest;
+	logDev("Login username: %s", username);
 
-		string serverId;
-		ubyte[] pubkey;
-		ubyte[] verifyToken;
+	Packet loginSuccess;
+	loginSuccess.type = 0x02;
+	loginSuccess.data ~= String("dffddebf-6aef-4767-9202-d17a6769b5aa");
+	loginSuccess.data ~= String(username);
+	loginSuccess.updateLength();
+	client.write(loginSuccess);
 
-		Buffer data;
-		data ~= String(serverId);
-		data ~= VarInt(pubkey.length.to!int);
-		data ~= pubkey;
+	//Packet encryptionRequest = createEncryptionRequest();
+	//client.write(encryptionRequest);
 
-		data ~= VarInt(verifyToken.length.to!int);
-		data ~= verifyToken;
+	/*
+	// Working disconnect
+	Packet disconnect;
+	disconnect.type = 0x00;
+	JSONValue chat = JSONValue(["text": "Disconnect because why not"]);
+	disconnect.data = String(chat.toString);
+	disconnect.updateLength();
+	client.write(disconnect);
+	*/
 
-		encryptionRequest = Packet(0x01, data);
+	return GameState.LOGIN;
+}
 
-		_client.write(encryptionRequest);
-	}
+Packet createEncryptionRequest()
+{
+	Packet encryptionRequest;
 
-	GameState handle(Buffer buffer)
-	{
-		logDev("Handling LoginStart!");
-		string username = String.read(buffer);
+	string serverId;
+	ubyte[] pubkey = [1, 2, 3];
+	ubyte[] verifyToken = [1, 2, 3, 4];
 
-		logDev("Login username: %s", username);
+	Buffer data;
+	data ~= String(serverId);
+	data ~= VarInt(pubkey.length.to!int);
+	data ~= pubkey;
 
-		sendEncryptionRequest();
+	data ~= VarInt(verifyToken.length.to!int);
+	data ~= verifyToken;
 
-		return GameState.LOGIN;
-	}
+	return Packet(0x01, data);
 }

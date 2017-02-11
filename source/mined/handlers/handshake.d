@@ -13,15 +13,10 @@ import mined.types.string;
 
 GameState handleHandshake(Packet packet, Client client)
 {
-	logDev("Packet data: %s", packet.data);
 	uint protocolVersion = VarInt.read(packet.data).value;
-	logDev("	* Remaining buffer: %s", packet.data);
 	string hostname = String.read(packet.data);
-	logDev("	* Read hostname: %s, Remaining buffer: %s", hostname, packet.data);
 	ushort port = packet.data.read!ushort;
-	logDev("	* Read port: %d, Remaining buffer: %s", port, packet.data);
 	int nextState = VarInt.read(packet.data).value;
-	logDev("	* Remaining buffer: %s", packet.data);
 
 	logDev("Protocol: %d, hostname: %s, port: %d, nextState: %d", protocolVersion, hostname, port, nextState);
 

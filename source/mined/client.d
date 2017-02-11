@@ -23,7 +23,12 @@ class Client
 		Buffer _packetBuffer;
 	}
 
-	@property server()
+	@property const state()
+	{
+		return _state;
+	}
+
+	@property const server()
 	{
 		return _server;
 	}
@@ -111,7 +116,7 @@ class Client
 				0x01: &handlePing,
 			],
 			GameState.LOGIN: [
-				0x00: &dummyHandler,
+				0x00: &handleLoginstart,
 			]
 		];
 
